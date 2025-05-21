@@ -22,7 +22,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
 import androidx.core.internal.view.SupportMenu
 import androidx.core.os.bundleOf
@@ -195,6 +194,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
 
     private fun setFloatingActionButton(){
         val fab = rootView?.findViewById<FloatingActionButton>(R.id.fab)
+        val markerId = generateRandom10DigitString()
         fab?.setOnClickListener {
             val markerLocation = this.getMapLocation()
             if(markerLocation != null) {
@@ -203,7 +203,8 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                         projectIds = arrayListOf(projectModel.id),
                         idLocal = UUID.randomUUID().toString(),
                         markerModel = "1405",
-                        generalId = generateRandom10DigitString(),
+                        generalId = markerId,
+                        markerId = markerId,
                         id = projectModel.id,
                         location = listOf(markerLocation.latitude, markerLocation.longitude),
                         status = Constants.MarkerStatus.NEW
