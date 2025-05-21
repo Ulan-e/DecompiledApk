@@ -86,7 +86,7 @@ class ProjectsViewModel @Inject constructor(
     }
 
     /* access modifiers changed from: private */
-    fun insertTagEntityList(list: List<TagModel?>?) {
+    private fun insertTagEntityList(list: List<TagModel?>?) {
         tagRepository.deleteAll()
         tagRepository.addTagList(list)
     }
@@ -103,7 +103,8 @@ class ProjectsViewModel @Inject constructor(
                         val tags = result.value
                         if (tags?.isNotEmpty() == true) {
                             tagsAll.addAll(tags)
-                            //getTags()  // Recursive call for additional tags
+                          //  getTags()  // Recursive call for additional tags
+                            insertTagEntityList(tagsAll)
                         } else {
                             insertTagEntityList(tagsAll)
                         }
