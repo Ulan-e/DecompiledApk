@@ -109,6 +109,12 @@ public final class MarkerIdentifierView extends LinearLayout {
             }
         });
     }
+
+    public void enableEdit(Boolean enable){
+        EditText etText = (EditText) _$_findCachedViewById(R.id.et_text);
+        etText.setEnabled(enable);
+    }
+
     public final void setData(String str, OnFieldValueChangeListener onFieldValueChangeListener) {
         Intrinsics.checkParameterIsNotNull(onFieldValueChangeListener, ServiceSpecificExtraArgs.CastExtraArgs.LISTENER);
         this.mValue = str;
@@ -121,7 +127,7 @@ public final class MarkerIdentifierView extends LinearLayout {
     public final boolean isIdentifierEmpty() {
         EditText editText = (EditText) _$_findCachedViewById(R.id.et_text);
         String text = editText.getText().toString().trim();
-        return !text.isEmpty();
+        return text.length() < 14;
     }
 
     public final String getValue() {

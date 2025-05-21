@@ -2,7 +2,6 @@ package kz.sapasoft.emark.app.ui.custom_views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -22,6 +21,7 @@ import kotlin.jvm.internal.Intrinsics;
 import kz.sapasoft.emark.app.domain.model.ImageDataModel;
 import kz.sapasoft.emark.app.ui.marker.OnFieldValueChangeListener;
 import kz.sapasoft.emark.app.ui.marker.OnImageClickListener;
+import kz.sapasoft.emark.app.ui.photo.OnPhotoViewListener;
 import kz.sapasoft.emark.app.ui.photo.PhotoAdapter;
 import pl.aprilapps.easyphotopicker.MediaFile;
 
@@ -33,6 +33,8 @@ public final class MarkerPhotoView extends LinearLayout implements PhotoAdapter.
     private Context mContext;
     private OnFieldValueChangeListener mFieldChangeListener;
     private OnImageClickListener mImageClickListener;
+
+    private OnPhotoViewListener onPhotoViewListener;
 
     public MarkerPhotoView(Context context) {
         this(context, (AttributeSet) null, 0, 6, (DefaultConstructorMarker) null);
@@ -62,10 +64,6 @@ public final class MarkerPhotoView extends LinearLayout implements PhotoAdapter.
         return findViewById;
     }
 
-    public void onPhotoClick(ImageDataModel imageDataModel) {
-        Intrinsics.checkParameterIsNotNull(imageDataModel, "imageDataModel");
-    }
-
     /* JADX INFO: this call moved to the top of the method (can break code semantics) */
     public /* synthetic */ MarkerPhotoView(Context context, AttributeSet attributeSet, int i, int i2, DefaultConstructorMarker defaultConstructorMarker) {
         this(context, (i2 & 2) != 0 ? null : attributeSet, (i2 & 4) != 0 ? 0 : i);
@@ -86,6 +84,10 @@ public final class MarkerPhotoView extends LinearLayout implements PhotoAdapter.
     public final void setImageDataModelList(List<ImageDataModel> list) {
         Intrinsics.checkParameterIsNotNull(list, "imageDataModelList");
         this.adapter.add(list);
+    }
+
+    public void setOnPhotoClickListener(OnPhotoViewListener onPhotoViewListener){
+        this.onPhotoViewListener = onPhotoViewListener;
     }
 
     public final List<ImageDataModel> getChangedModelList() {
@@ -116,6 +118,11 @@ public final class MarkerPhotoView extends LinearLayout implements PhotoAdapter.
         if (onImageClickListener != null) {
             onImageClickListener.onAddPhotoClick();
         }
+    }
+
+    @Override
+    public void onPhotoClick(ImageDataModel imageDataModel) {
+        onPhotoViewListener.onPhotoClick(imageDataModel);
     }
 
     public void onPhotoDeleted() {

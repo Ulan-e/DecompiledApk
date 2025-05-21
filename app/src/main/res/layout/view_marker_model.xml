@@ -27,9 +27,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:background="@null"
-        android:enabled="true"
+        android:enabled="false"
         android:hint="@string/enter_value"
-        android:text="@string/_1405_xr"
         android:textColor="@color/black"
         android:textSize="16sp" />
 </LinearLayout>

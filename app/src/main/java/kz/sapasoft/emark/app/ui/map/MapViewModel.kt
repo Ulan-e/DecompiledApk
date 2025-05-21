@@ -89,8 +89,10 @@ class MapViewModel @Inject constructor(
                 is ResultWrapper.Error -> error.postValue(result)
                 is ResultWrapper.Success -> {
                     val markers = result.value
-                    if (markers?.isNotEmpty() == true) {
+                    if (markers.isNotEmpty()) {
                         markerListAll.addAll(markers)
+                        val syncedList = markerListAll.map { it.toSync() }
+                        markerSyncRepository.addWithReplace(syncedList)
                         markerModelListData.postValue(markerListAll)
                     } else {
                         insertMarkerEntityList(projectIds.first(), markerListAll)
@@ -131,6 +133,7 @@ class MapViewModel @Inject constructor(
 
     suspend fun saveMarkerList(projectId: String) {
         val markerSyncList = markerSyncRepository.findByProjectId(projectId)
+        Log.d(TAG, "BS markerSyncList size--- ${markerSyncList.size} ")
 
         for (markerSync in markerSyncList) {
             val markerModel = markerSync.toModel()
@@ -157,6 +160,7 @@ class MapViewModel @Inject constructor(
                 is ResultWrapper.Error -> {
                     error.postValue(result)
                 }
+
                 is ResultWrapper.Success -> {
                     deleteMarkerSyncById(markerModel.id)
 
@@ -178,7 +182,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun getMarkerEntityList(str: String?) {
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Main.immediate).launch {
             val markerModels = mutableListOf<MarkerModel>()
 
             // Get synchronized markers
@@ -225,8 +229,9 @@ class MapViewModel @Inject constructor(
     }
 
     /* access modifiers changed from: private */
-    fun insertMarkerEntityList(str: String?, list: List<MarkerModel?>?) {
+    private suspend fun insertMarkerEntityList(str: String?, list: List<MarkerModel?>?) {
         markerRepository.deleteByProjectId(str)
+        Log.d("MMarker", "markers insertMarkerEntityList ${list?.size}")
         markerRepository.addWithReplace(list)
     }
 
@@ -234,7 +239,7 @@ class MapViewModel @Inject constructor(
         markerRepository.addWithReplace(markerModel)
     }
 
-    fun checkId(str: String?):Boolean {
+    fun checkId(str: String?): Boolean {
         val idRegex = Regex("(?<=#:)(.*)")
         if (str != null) {
             val id = idRegex.find(str)?.value?.takeIf {
@@ -271,6 +276,7 @@ class MapViewModel @Inject constructor(
             markerModel = model,
             location = listOf(location.latitude, location.longitude),
             markerId = id,
+            generalId = id,
             status = Constants.MarkerStatus.NEW
         )
     }

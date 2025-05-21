@@ -1,6 +1,7 @@
 package kz.sapasoft.emark.app.data.local.room.marker;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 
 import androidx.room.RoomDatabase;
 import java.util.List;
@@ -16,12 +17,10 @@ public final class MarkerDataSource implements MarkerRepository {
 
     @Inject
     public MarkerDataSource(MarkerDao markerDao2) {
-        Intrinsics.checkParameterIsNotNull(markerDao2, "markerDao");
         this.markerDao = markerDao2;
     }
 
     public void addWithReplace(MarkerModel markerModel) {
-        Intrinsics.checkParameterIsNotNull(markerModel, "markerModel");
         this.markerDao.insertWithReplace(markerModel);
     }
 
@@ -31,8 +30,9 @@ public final class MarkerDataSource implements MarkerRepository {
     }
 
     public List<MarkerModel> findByProjectId(String str) {
-        Intrinsics.checkParameterIsNotNull(str, "projectId");
-        return this.markerDao.findByProjectId(str);
+        List<MarkerModel> markers = this.markerDao.findByProjectId(str);
+        Log.d("MMarker", "bd findByProjectId markersSize" + markers.size() + "str " + str);
+        return markers;
     }
 
     @SuppressLint("RestrictedApi")
@@ -45,7 +45,6 @@ public final class MarkerDataSource implements MarkerRepository {
     }
 
     public void deleteByProjectId(String str) {
-        Intrinsics.checkParameterIsNotNull(str, "projectId");
         this.markerDao.deleteByProjectId(str);
     }
 }

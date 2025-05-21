@@ -16,5 +16,5 @@ data class ImageDataModel(
     data class MetaData(
         var parentId: String? = null,
         var queryKey: String? = null
-    )
+    ): Serializable
 }

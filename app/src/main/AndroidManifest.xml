@@ -66,6 +66,7 @@
             android:name="kz.sapasoft.emark.app.ui.welcome.WelcomeActivity"
             android:theme="@style/AppTheme"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -76,6 +77,7 @@
             android:name="kz.sapasoft.emark.app.ui.MainActivity"
             android:theme="@style/SAppTheme"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:label="">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
@@ -84,6 +86,7 @@
         <activity
             android:name="kz.sapasoft.emark.app.ui.photo.PhotoActivity"
             android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"
             android:exported="true"
             android:label="" />
 

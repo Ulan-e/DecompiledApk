@@ -40,84 +40,72 @@ public final class DatabaseModule {
     @Singleton
     @Provides
     public final ProjectDao providesProjectDao(LocalDatabase localDatabase) {
-        Intrinsics.checkParameterIsNotNull(localDatabase, "database");
         return localDatabase.getProjectDao();
     }
 
     @Singleton
     @Provides
     public final TagDao providesTagDao(LocalDatabase localDatabase) {
-        Intrinsics.checkParameterIsNotNull(localDatabase, "database");
         return localDatabase.getTagDao();
     }
 
     @Singleton
     @Provides
     public final TemplateDao providesTemplateDao(LocalDatabase localDatabase) {
-        Intrinsics.checkParameterIsNotNull(localDatabase, "database");
         return localDatabase.getTemplateDao();
     }
 
     @Singleton
     @Provides
     public final MarkerDao providesMarkerDao(LocalDatabase localDatabase) {
-        Intrinsics.checkParameterIsNotNull(localDatabase, "database");
         return localDatabase.getMarkerDao();
     }
 
     @Singleton
     @Provides
     public final MarkerSyncDao providesMarkerSyncDao(LocalDatabase localDatabase) {
-        Intrinsics.checkParameterIsNotNull(localDatabase, "database");
         return localDatabase.getMarkerSyncDao();
     }
 
     @Singleton
     @Provides
     public final ImageDao providesImageDao(LocalDatabase localDatabase) {
-        Intrinsics.checkParameterIsNotNull(localDatabase, "database");
         return localDatabase.getImageDao();
     }
 
     @Singleton
     @Provides
     public final ProjectRepository projectRepository(ProjectDao projectDao) {
-        Intrinsics.checkParameterIsNotNull(projectDao, "projectDao");
         return new ProjectDataSource(projectDao);
     }
 
     @Singleton
     @Provides
     public final TagRepository tagRepository(TagDao tagDao) {
-        Intrinsics.checkParameterIsNotNull(tagDao, "tagDao");
         return new TagDataSource(tagDao);
     }
 
     @Singleton
     @Provides
     public final TemplateRepository templateRepository(TemplateDao templateDao) {
-        Intrinsics.checkParameterIsNotNull(templateDao, "templateDao");
         return new TemplateDataSource(templateDao);
     }
 
     @Singleton
     @Provides
     public final MarkerRepository markerRepository(MarkerDao markerDao) {
-        Intrinsics.checkParameterIsNotNull(markerDao, "markerDao");
         return new MarkerDataSource(markerDao);
     }
 
     @Singleton
     @Provides
     public final MarkerSyncRepository markerSyncRepository(MarkerSyncDao markerSyncDao) {
-        Intrinsics.checkParameterIsNotNull(markerSyncDao, "markerSyncDao");
         return new MarkerSyncDataSource(markerSyncDao);
     }
 
     @Singleton
     @Provides
     public final ImageRepository imageRepository(ImageDao imageDao) {
-        Intrinsics.checkParameterIsNotNull(imageDao, "imageDao");
         return new ImageDataSource(imageDao);
     }
 }

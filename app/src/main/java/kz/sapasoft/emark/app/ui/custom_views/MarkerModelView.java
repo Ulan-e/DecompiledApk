@@ -66,6 +66,11 @@ public final class MarkerModelView extends LinearLayout {
         ((EditText) _$_findCachedViewById(R.id.et_text)).setText(str);
     }
 
+    public void enableEdit(Boolean enable){
+        EditText etText = (EditText) _$_findCachedViewById(R.id.et_text);
+        etText.setEnabled(enable);
+    }
+
     public final String getMarkerModel() {
         EditText editText = (EditText) _$_findCachedViewById(R.id.et_text);
         Intrinsics.checkExpressionValueIsNotNull(editText, "et_text");

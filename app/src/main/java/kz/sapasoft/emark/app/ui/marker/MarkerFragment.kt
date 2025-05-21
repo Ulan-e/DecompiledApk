@@ -40,6 +40,8 @@ import kz.sapasoft.emark.app.ui.custom_views.MarkerIdentifierView
 import kz.sapasoft.emark.app.ui.custom_views.MarkerModelView
 import kz.sapasoft.emark.app.ui.custom_views.MarkerPhotoView
 import kz.sapasoft.emark.app.ui.custom_views.MarkerTypeView
+import kz.sapasoft.emark.app.ui.photo.OnPhotoViewListener
+import kz.sapasoft.emark.app.ui.photo.PhotoViewFragment
 import kz.sapasoft.emark.app.utils.Constants
 import kz.sapasoft.emark.app.utils.showToast
 import pl.aprilapps.easyphotopicker.EasyImage
@@ -49,7 +51,7 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.jvm.internal.Intrinsics
 
-class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnMarkerTypeChangeListener, OnImageClickListener {
+class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnMarkerTypeChangeListener, OnImageClickListener, OnPhotoViewListener {
 
     private val REQUEST_CAMERA_PERMISSION = 1
     private val TAG: String = this::class.java.simpleName
@@ -104,6 +106,14 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
         if (mMarkerModel?.status == null) {
             (view.findViewById(R.id.btn_save) as MaterialButton).visibility = View.GONE
         }
+        // эти поля должны быть не редатируемыми
+//        else if( mMarkerModel?.status == Constants.MarkerStatus.NEW){
+//            view.findViewById<MarkerIdentifierView>(R.id.view_marker_identifier).enableEdit(true)
+//            view.findViewById<MarkerModelView>(R.id.view_marker_model).enableEdit(true)
+//        }
+
+        requireView().findViewById<MarkerPhotoView>(R.id.view_marker_photo)
+            .setOnPhotoClickListener(this)
     }
 
     private fun setListeners(view: View) {
@@ -114,15 +124,16 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
             }
             val identifierView = rootView?.findViewById<MarkerIdentifierView>(R.id.view_marker_identifier)
             if(identifierView?.isIdentifierEmpty() == true) {
-                viewModel.saveMarkerAndImage(newMarkerModel, constructImageDataModel())
-            }else {
                 requireContext().showToast("Идентификатор не должен быть пустым")
+            }else {
+                viewModel.saveMarkerAndImage(newMarkerModel, constructImageDataModel())
             }
         }
     }
 
     fun constructImageDataModel(): List<ImageDataModel> {
         val changedModelList = requireView().findViewById<MarkerPhotoView>(R.id.view_marker_photo).changedModelList
+
         mMarkerModel?.let { markerModel ->
             changedModelList.forEach { it.localIdParent = markerModel.idLocal }
         } ?: throw UninitializedPropertyAccessException("mMarkerModel")
@@ -136,9 +147,15 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
             markerModel.generalId,
             onFieldValueChangeListener
         )
-        (rootView?.findViewById(R.id.view_marker_model) as MarkerModelView).setData(
-            markerModel.markerModel
-        )
+
+        if (mMarkerModel?.status == Constants.MarkerStatus.NEW) {
+            (rootView?.findViewById(R.id.view_marker_model) as MarkerModelView).setData("1405${markerModel.markerModel}")
+        } else {
+            (rootView?.findViewById(R.id.view_marker_model) as MarkerModelView).setData(
+                markerModel.markerModel
+            )
+        }
+
         (rootView?.findViewById(R.id.view_marker_depth) as MarkerDepthView).setData(
             markerModel.depth,
             onFieldValueChangeListener
@@ -375,7 +392,7 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
     override fun onMarkerTypeChange(templateModel: TemplateModel) {
         drawFieldList(templateModel.fields)
         mMarkerModel?.fields?.let {
-            //fillFields(it)
+            fillFields(it)
         }
     }
 
@@ -431,5 +448,11 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
     override fun onFieldValueChange() {
         (rootView?.findViewById<MaterialButton>(R.id.btn_save) as MaterialButton).isEnabled =
             checkMainHasChanges() || checkFieldsHasChanges()
+    }
+
+    override fun onPhotoClick(imageDataModel: ImageDataModel) {
+        getChildFragmentClickListener().onFragmentAdd(
+            PhotoViewFragment.newInstance(imageDataModel)
+        )
     }
 }

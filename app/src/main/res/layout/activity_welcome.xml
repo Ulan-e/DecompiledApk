@@ -59,6 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/username"
+                android:text="Admin2023"
                 android:inputType="text"
                 android:maxLines="1"
                 android:singleLine="true" />
@@ -79,6 +80,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/password"
+                android:text="Admin123456"
                 android:inputType="textPassword"
                 android:maxLines="1"
                 android:singleLine="true" />
@@ -99,6 +101,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/server_port"
+                android:text="https://emark.ktga.kz/"
                 android:inputType="textUri"
                 android:maxLines="1"
                 android:singleLine="true" />

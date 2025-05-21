@@ -22,9 +22,9 @@ public final class MarkerSyncDataSource implements MarkerSyncRepository {
         this.markerDao.insertWithReplace(markerModelSync);
     }
 
-    public void addWithReplace(List<MarkerModelSync> list) {
+    public List<Long> addWithReplace(List<MarkerModelSync> list) {
         Intrinsics.checkParameterIsNotNull(list, "markerModelList");
-        this.markerDao.insertWithReplace(list);
+        return this.markerDao.insertWithReplace(list);
     }
 
     public List<MarkerModelSync> findByProjectId(String str) {

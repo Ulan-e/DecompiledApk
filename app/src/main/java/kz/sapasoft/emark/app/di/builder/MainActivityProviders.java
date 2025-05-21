@@ -7,6 +7,7 @@ import kz.sapasoft.emark.app.ui.about.AboutFragment;
 import kz.sapasoft.emark.app.ui.main_fragments.MainFragment;
 import kz.sapasoft.emark.app.ui.map.MapFragment;
 import kz.sapasoft.emark.app.ui.marker.MarkerFragment;
+import kz.sapasoft.emark.app.ui.photo.PhotoViewFragment;
 import kz.sapasoft.emark.app.ui.projects.ProjectsFragment;
 import kz.sapasoft.emark.app.ui.settings.SettingsFragment;
 
@@ -31,4 +32,7 @@ public abstract class MainActivityProviders {
 
     @ContributesAndroidInjector
     public abstract SettingsFragment provideSettingsFragment();
+
+    @ContributesAndroidInjector
+    public abstract PhotoViewFragment providePhotoViewFragment();
 }

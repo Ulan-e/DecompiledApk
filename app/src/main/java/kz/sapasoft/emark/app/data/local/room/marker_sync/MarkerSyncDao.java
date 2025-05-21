@@ -21,12 +21,12 @@ public interface MarkerSyncDao {
     void deleteById(String id);
 
     // Поиск записей по projectId
-    @Query("SELECT * FROM marker_sync WHERE id = :projectId")
+    @Query("SELECT * FROM marker_sync WHERE :projectId IN (projectIds)")
     List<MarkerModelSync> findByProjectId(String projectId);
 
     // Вставка списка с заменой при конфликте
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertWithReplace(List<MarkerModelSync> list);
+    List<Long> insertWithReplace(List<MarkerModelSync> list);
 
     // Вставка одного объекта с заменой при конфликте
     @Insert(onConflict = OnConflictStrategy.REPLACE)
