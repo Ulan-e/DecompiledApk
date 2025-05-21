@@ -170,6 +170,13 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
             utils.hideKeyboard(textView2)
             viewModel.getMarkerList(arrayListOf(projectModel.id))
             viewModel.getTemplateList(projectModel.markerTemplateIds)
+
+            viewModel.relaunchState.observe(viewLifecycleOwner){ relaunch ->
+                if(relaunch){
+                    viewModel.getMarkerList(arrayListOf(projectModel.id))
+                //setObservers()
+                }
+            }
             val activity2: FragmentActivity = requireActivity()
             if (activity2 != null) {
                 (activity2 as MainActivity).setDeviceListener(this)
@@ -270,13 +277,13 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                 override fun onError(e: Exception?) {
                     Log.d(TAG, "BS onError e: ${e?.message}")
                     e?.printStackTrace()
-                    activity?.runOnUiThread {
-                        if (isAdded) {
-                            context?.let { ctx ->
-                                requireContext().showToast("BS onError e: ${e?.message}")
-                            }
-                        }
-                    }
+//                    activity?.runOnUiThread {
+//                        if (isAdded) {
+//                            context?.let { ctx ->
+//                                requireContext().showToast("BS onError e: ${e?.message}")
+//                            }
+//                        }
+//                    }
                 }
             }
         )
@@ -465,8 +472,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
     }
 
     override fun onMarkerChange() {
-        Log.d("MMarker", "onMarkerChange")
-        viewModel.getMarkerEntityList(projectModel.id)
+        viewModel.synchronizeMarkers(projectModel.id, true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {

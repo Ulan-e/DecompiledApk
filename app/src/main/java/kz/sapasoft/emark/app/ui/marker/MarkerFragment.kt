@@ -142,7 +142,6 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
     }
 
     fun fillMain(markerModel: MarkerModel) {
-        Log.d("terra", "fillMain(markerModel -----> ${markerModel.generalId}")
         val onFieldValueChangeListener: OnFieldValueChangeListener = this
         (rootView?.findViewById(R.id.view_marker_identifier) as MarkerIdentifierView).setData(
             markerModel.generalId,

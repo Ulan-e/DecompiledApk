@@ -181,7 +181,6 @@ class MarkerViewModel @Inject constructor(
     fun saveMarkerAndImage(markerModel: MarkerModel, imageDataModelList: List<ImageDataModel>) {
         launchIO {
             markerSyncRepository.addWithReplace(markerModel.toSync())
-            Log.d("MMarker", "saveMarkerAndImage markerModel ${markerModel.toSync()}")
 
             val idLocal = markerModel.idLocal ?: throw NullPointerException("idLocal is null")
 

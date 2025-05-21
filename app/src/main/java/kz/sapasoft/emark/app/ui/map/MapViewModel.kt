@@ -3,6 +3,7 @@ package kz.sapasoft.emark.app.ui.map
 import android.location.Location
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import id.zelory.compressor.Compressor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +69,10 @@ class MapViewModel @Inject constructor(
         get() = `error$delegate`
     val markerModelListData: MutableLiveData<List<MarkerModel>> = MutableLiveData()
 
+    val relaunchState: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
+    }
+
     init {
         baseCloudRepository = baseCloudRepository2
         templateRepository = templateRepository2
@@ -120,7 +125,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun synchronizeMarkers(projectId: String?) {
+    fun synchronizeMarkers(projectId: String?, relaunch: Boolean = false) {
         requireNotNull(projectId) { "projectId cannot be null" }
 
         launchIO {
@@ -128,6 +133,9 @@ class MapViewModel @Inject constructor(
             saveMarkerList(projectId)
             // Then retrieve the synchronized marker entity list
             getMarkerEntityList(projectId)
+        }
+        if(relaunch){
+            relaunchState.postValue(true)
         }
     }
 
@@ -182,7 +190,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun getMarkerEntityList(str: String?) {
-        CoroutineScope(Dispatchers.Main.immediate).launch {
+        viewModelScope.launch {
             val markerModels = mutableListOf<MarkerModel>()
 
             // Get synchronized markers
