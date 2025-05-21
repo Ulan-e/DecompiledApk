@@ -254,6 +254,8 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                         Log.d(TAG, "BS connecting $characteristicValue")
                         if (viewModel.checkId(characteristicValue)) {
                             addMarker(characteristicValue)
+                        } else {
+                            showSnackBar("checkId return false")
                         }
                     }
                 }
@@ -563,7 +565,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
         val location3 = this.getMapLocation()
         val marker = viewModel.getMarkerModelFromByteStr(str, location3)
         if (marker != null) {
-//            addGasMarkerToMapMarkers(marker,1)
+            addGasMarkerToMapMarkers(marker,1)
             openMarkerFragment(marker)
         }
     }

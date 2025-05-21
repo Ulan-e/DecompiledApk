@@ -142,6 +142,7 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
     }
 
     fun fillMain(markerModel: MarkerModel) {
+        Log.d("terra", "fillMain(markerModel -----> ${markerModel.generalId}")
         val onFieldValueChangeListener: OnFieldValueChangeListener = this
         (rootView?.findViewById(R.id.view_marker_identifier) as MarkerIdentifierView).setData(
             markerModel.generalId,
@@ -149,7 +150,7 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
         )
 
         if (mMarkerModel?.status == Constants.MarkerStatus.NEW) {
-            (rootView?.findViewById(R.id.view_marker_model) as MarkerModelView).setData("1405${markerModel.markerModel}")
+            (rootView?.findViewById(R.id.view_marker_model) as MarkerModelView).setData("${markerModel.markerModel}")
         } else {
             (rootView?.findViewById(R.id.view_marker_model) as MarkerModelView).setData(
                 markerModel.markerModel
@@ -382,6 +383,7 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
             markerModel = (rootView?.findViewById<MarkerModelView>(R.id.view_marker_model) as MarkerModelView).markerModel,
             markerType = (rootView?.findViewById<MarkerTypeView>(R.id.view_marker_type) as MarkerTypeView).markerType,
             templateId = (rootView?.findViewById<MarkerTypeView>(R.id.view_marker_type) as MarkerTypeView).templateId,
+            generalId = (rootView?.findViewById<MarkerIdentifierView>(R.id.view_marker_identifier) as MarkerIdentifierView).value,
             depth = (rootView?.findViewById<MarkerDepthView>(R.id.view_marker_depth) as MarkerDepthView).getValue(),
             idLocal = markerModel.idLocal ?: UUID.randomUUID().toString(),
             fields = mFieldViewList.map { it.getFieldModel() }
