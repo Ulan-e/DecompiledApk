@@ -277,13 +277,13 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                 override fun onError(e: Exception?) {
                     Log.d(TAG, "BS onError e: ${e?.message}")
                     e?.printStackTrace()
-//                    activity?.runOnUiThread {
-//                        if (isAdded) {
-//                            context?.let { ctx ->
-//                                requireContext().showToast("BS onError e: ${e?.message}")
-//                            }
-//                        }
-//                    }
+                    activity?.runOnUiThread {
+                        if (isAdded) {
+                            context?.let { ctx ->
+                                requireContext().showToast("BS onError e: ${e?.message}")
+                            }
+                        }
+                    }
                 }
             }
         )
