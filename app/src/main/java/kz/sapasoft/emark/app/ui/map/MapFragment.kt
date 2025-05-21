@@ -203,6 +203,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                         projectIds = arrayListOf(projectModel.id),
                         idLocal = UUID.randomUUID().toString(),
                         markerModel = "1405",
+                        generalId = generateRandom10DigitString(),
                         id = projectModel.id,
                         location = listOf(markerLocation.latitude, markerLocation.longitude),
                         status = Constants.MarkerStatus.NEW
@@ -210,6 +211,11 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                 )
             }
         }
+    }
+
+    fun generateRandom10DigitString(): String {
+        val number = (0..999_999_999).random()
+        return number.toString().padStart(10, '0')
     }
 
     private val projectModel: ProjectModel
