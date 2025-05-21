@@ -1,7 +1,9 @@
 package kz.sapasoft.emark.app.ui.map
 
 //import com.hoho.android.usbserial.driver.UsbSerialDriver
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
@@ -20,6 +22,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
 import androidx.core.internal.view.SupportMenu
 import androidx.core.os.bundleOf
@@ -70,7 +73,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
     UsbSerialInterface.UsbReadCallback,
     OnNewDeviceAttached {
 
-    private val REQUEST_LOCATION_PERMISSIONS = 1
+    private val REQUEST_PERMISSIONS_CODE = 101
     private val TAG: String = "BLEq"
     private var `_$_findViewCache`: HashMap<*, *>? = null
     private val buffer = ByteArrayOutputStream()
@@ -175,12 +178,19 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                 drawPin(view)
                 setObservers()
                 //setListeners()
-                requestGpsPermission()
+                // requestGpsPermission()
+                checkAndRequestPermissions()
                 return
             }
             throw TypeCastException("null cannot be cast to non-null type kz.sapasoft.emark.app.ui.MainActivity")
         }
         throw TypeCastException("null cannot be cast to non-null type kz.sapasoft.emark.app.ui.MainActivity")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        bluetoothService?.disconnectAndClose()
+        bluetoothService = null // Clear reference
     }
 
     private fun setFloatingActionButton(){
@@ -190,7 +200,9 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
             if(markerLocation != null) {
                 openMarkerFragment(
                     MarkerModel(
+                        projectIds = arrayListOf(projectModel.id),
                         idLocal = UUID.randomUUID().toString(),
+                        markerModel = "1405",
                         id = projectModel.id,
                         location = listOf(markerLocation.latitude, markerLocation.longitude),
                         status = Constants.MarkerStatus.NEW
@@ -217,7 +229,13 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
             object : BluetoothServiceCallback {
                 override fun onDiscovered(value: String?) {
                     Log.d(TAG, "BS onDiscovered value $value ")
-                    requireContext().showToast("BS onDiscovered value $value")
+                    activity?.runOnUiThread {
+                        if (isAdded) { // Ensure fragment is still added and has a context
+                            context?.let { ctx ->
+                                ctx.showToast("BS onDiscovered value $value")
+                            }
+                        }
+                    }
                 }
 
                 override fun onChanged(
@@ -242,7 +260,14 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
 
                 override fun onError(e: Exception?) {
                     Log.d(TAG, "BS onError e: ${e?.message}")
-                    requireContext().showToast("BS onError e: ${e?.message}")
+                    e?.printStackTrace()
+                    activity?.runOnUiThread {
+                        if (isAdded) {
+                            context?.let { ctx ->
+                                requireContext().showToast("BS onError e: ${e?.message}")
+                            }
+                        }
+                    }
                 }
             }
         )
@@ -293,17 +318,20 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
         }
         viewModel.error.observe(viewLifecycleOwner) { error ->
             val errorMessage = error?.toString() ?: "Error ______"
-            showSnackBar(errorMessage)
+            Log.e("MapFragment","errorMessage while syncing with server $errorMessage")
+            // showSnackBar(errorMessage)
         }
     }
 
     /* access modifiers changed from: private */
     fun showSnackBar(str: String?) {
-        Snackbar.make(
-            mapView!!,
-            "str as CharSequence?",
-            BaseTransientBottomBar.LENGTH_INDEFINITE
-        ).show()
+        (str as CharSequence?)?.let {
+            Snackbar.make(
+                mapView!!,
+                it,
+                BaseTransientBottomBar.LENGTH_INDEFINITE
+            ).show()
+        }
     }
 
     private fun drawPin(view: View) {
@@ -428,6 +456,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
     }
 
     override fun onMarkerChange() {
+        Log.d("MMarker", "onMarkerChange")
         viewModel.getMarkerEntityList(projectModel.id)
     }
 
@@ -534,6 +563,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
         val location3 = this.getMapLocation()
         val marker = viewModel.getMarkerModelFromByteStr(str, location3)
         if (marker != null) {
+//            addGasMarkerToMapMarkers(marker,1)
             openMarkerFragment(marker)
         }
     }
@@ -586,47 +616,28 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
         )
     }
 
-    private fun requestGpsPermission() {
-        val strArr = arrayOf("android.permission.ACCESS_FINE_LOCATION")
-        if (!hasPermissions()) {
-            requestPermissions(strArr, REQUEST_LOCATION_PERMISSIONS)
-        }
-    }
-
-    private fun hasPermissions(): Boolean {
-        return if (Build.VERSION.SDK_INT < 23 || ContextCompat.checkSelfPermission(
-                requireContext(),
-                "android.permission.ACCESS_FINE_LOCATION"
-            ) == 0
-        ) {
-            true
-        } else false
-    }
-
     override fun onRequestPermissionsResult(i: Int, strArr: Array<String>, iArr: IntArray) {
         Intrinsics.checkParameterIsNotNull(strArr, "permissions")
         Intrinsics.checkParameterIsNotNull(iArr, "grantResults")
         super.onRequestPermissionsResult(i, strArr, iArr)
-        if (i == REQUEST_LOCATION_PERMISSIONS) {
-            if (iArr.size == 0 || iArr[0] != 0) {
-                val string: String = getString(R.string.permission_gps_rejected)
-                Intrinsics.checkExpressionValueIsNotNull(
-                    string,
-                    "getString(R.string.permission_gps_rejected)"
-                )
-                showSnackBar(string)
-                return
+        if (i == REQUEST_PERMISSIONS_CODE) {
+            var allGranted = true
+            for (result in iArr) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false
+                    break
+                }
             }
-            mapView?.getOverlays()?.remove(mMyLocationOverlay)
-            val myLocationNewOverlay =
-                MyLocationNewOverlay(mapView)
-            mMyLocationOverlay = myLocationNewOverlay
-            if (myLocationNewOverlay != null) {
-                myLocationNewOverlay.enableMyLocation()
+            if (allGranted) {
+                Log.d(TAG, "All permissions granted.")
+                // It's safer to re-initialize or ensure bluetoothService is ready here if it wasn't earlier
+                // For now, let's assume handleBluetoothConnectionAndRead() was already called
+                // and it will retry or the service is waiting.
+                // A good place to initiate the scan if not already started:
+                bluetoothService?.searchAndConnectDevice()
+            } else {
+                Log.e(TAG, "Not all permissions granted.")
             }
-            Intrinsics.checkExpressionValueIsNotNull(mapView, "map_view")
-            mapView?.getOverlays()?.add(mMyLocationOverlay)
-            mapView?.invalidate()
         }
     }
 
@@ -657,6 +668,33 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
     override fun onNewDeviceAttached() {
         Log.d("SCAN_MARKER", "onNewDeviceAttached")
 //        setListeners()
+    }
+
+    private fun checkAndRequestPermissions() {
+        val permissionsToRequest = mutableListOf<String>()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.BLUETOOTH_SCAN)
+            }
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.BLUETOOTH_CONNECT)
+            }
+        } else {
+            // For older versions, BLUETOOTH and BLUETOOTH_ADMIN are not runtime permissions
+            // but ACCESS_FINE_LOCATION is, which you already handle.
+        }
+
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
+            permissionsToRequest.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
+
+        if (permissionsToRequest.isNotEmpty()) {
+            requestPermissions(permissionsToRequest.toTypedArray(), REQUEST_PERMISSIONS_CODE)
+        } else {
+            // All permissions granted, proceed with Bluetooth operations
+            bluetoothService?.searchAndConnectDevice()
+        }
     }
 
     companion object {
