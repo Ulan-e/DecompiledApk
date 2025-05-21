@@ -1,6 +1,7 @@
 package kz.sapasoft.emark.app.ui.custom_views
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -32,6 +33,7 @@ class FieldViewSpinner @JvmOverloads constructor(
         val spinner = findViewById<Spinner>(R.id.spinner).apply {
             adapter = ArrayAdapter(context, R.layout.item_spinner, tagNames)
             setSelection(matchingTags.indexOfFirst { it.templateId == mField.tagTemplateId })
+            setBackgroundResource(R.drawable.spinner_background)
             onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: android.widget.AdapterView<*>, view: View, position: Int, id: Long) {
                     listener.onFieldValueChange()
