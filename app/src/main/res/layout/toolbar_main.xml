@@ -8,6 +8,7 @@
     android:background="@color/white"
     android:clickable="true"
     android:focusable="true"
+    android:forceDarkAllowed="true"
     android:minHeight="?attr/actionBarSize"
     app:navigationIcon="@drawable/ic_chevron_left">
 

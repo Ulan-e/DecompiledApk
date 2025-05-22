@@ -470,8 +470,6 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
     }
 
     override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
-        Intrinsics.checkParameterIsNotNull(menu, "menu")
-        Intrinsics.checkParameterIsNotNull(menuInflater, "inflater")
         menuInflater.inflate(R.menu.map_menu, menu)
         super.onCreateOptionsMenu(menu, menuInflater)
     }
