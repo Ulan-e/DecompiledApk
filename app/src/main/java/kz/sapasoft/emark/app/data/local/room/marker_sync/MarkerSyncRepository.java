@@ -9,7 +9,7 @@ import kz.sapasoft.emark.app.domain.model.MarkerModelSync;
 public interface MarkerSyncRepository {
     List<Long> addWithReplace(List<MarkerModelSync> list);
 
-    void addWithReplace(MarkerModelSync markerModelSync);
+    long addWithReplace(MarkerModelSync markerModelSync);
 
     void deleteById(String str);
 

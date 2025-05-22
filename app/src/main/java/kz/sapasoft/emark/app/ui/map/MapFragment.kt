@@ -171,12 +171,6 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
             viewModel.getMarkerList(arrayListOf(projectModel.id))
             viewModel.getTemplateList(projectModel.markerTemplateIds)
 
-            viewModel.relaunchState.observe(viewLifecycleOwner){ relaunch ->
-                if(relaunch){
-                    viewModel.getMarkerList(arrayListOf(projectModel.id))
-                //setObservers()
-                }
-            }
             val activity2: FragmentActivity = requireActivity()
             if (activity2 != null) {
                 (activity2 as MainActivity).setDeviceListener(this)
@@ -472,7 +466,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
     }
 
     override fun onMarkerChange() {
-        viewModel.synchronizeMarkers(projectModel.id, true)
+        viewModel.getMarkerEntityList(projectModel.id)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {

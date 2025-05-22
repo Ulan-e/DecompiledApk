@@ -69,10 +69,6 @@ class MapViewModel @Inject constructor(
         get() = `error$delegate`
     val markerModelListData: MutableLiveData<List<MarkerModel>> = MutableLiveData()
 
-    val relaunchState: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>()
-    }
-
     init {
         baseCloudRepository = baseCloudRepository2
         templateRepository = templateRepository2
@@ -125,7 +121,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun synchronizeMarkers(projectId: String?, relaunch: Boolean = false) {
+    fun synchronizeMarkers(projectId: String?) {
         requireNotNull(projectId) { "projectId cannot be null" }
 
         launchIO {
@@ -134,14 +130,10 @@ class MapViewModel @Inject constructor(
             // Then retrieve the synchronized marker entity list
             getMarkerEntityList(projectId)
         }
-        if(relaunch){
-            relaunchState.postValue(true)
-        }
     }
 
     suspend fun saveMarkerList(projectId: String) {
         val markerSyncList = markerSyncRepository.findByProjectId(projectId)
-        Log.d(TAG, "BS markerSyncList size--- ${markerSyncList.size} ")
 
         for (markerSync in markerSyncList) {
             val markerModel = markerSync.toModel()

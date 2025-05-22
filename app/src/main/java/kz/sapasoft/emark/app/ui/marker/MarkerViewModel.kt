@@ -2,11 +2,14 @@ package kz.sapasoft.emark.app.ui.marker
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import id.zelory.compressor.Compressor
+import kz.sapasoft.emark.app.core.App
 import kz.sapasoft.emark.app.core.BaseViewModel
 import kz.sapasoft.emark.app.data.cloud.ResultWrapper
 import kz.sapasoft.emark.app.data.cloud.repository.BaseCloudRepository
 import kz.sapasoft.emark.app.data.local.prefs.PrefsImpl
 import kz.sapasoft.emark.app.data.local.room.image.ImageRepository
+import kz.sapasoft.emark.app.data.local.room.marker.MarkerRepository
 import kz.sapasoft.emark.app.data.local.room.marker_sync.MarkerSyncRepository
 import kz.sapasoft.emark.app.data.local.room.tag.TagRepository
 import kz.sapasoft.emark.app.data.local.room.template.TemplateRepository
@@ -15,6 +18,11 @@ import kz.sapasoft.emark.app.domain.model.MarkerModel
 import kz.sapasoft.emark.app.domain.model.TagModel
 import kz.sapasoft.emark.app.domain.model.TemplateModel
 import kz.sapasoft.emark.app.utils.Constants
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.File
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.jvm.internal.Intrinsics
@@ -25,6 +33,7 @@ class MarkerViewModel @Inject constructor(
     templateRepository2: TemplateRepository,
     imageRepository2: ImageRepository,
     markerSyncRepository2: MarkerSyncRepository,
+    markerRepository2: MarkerRepository,
     tagRepository2: TagRepository
 ) : BaseViewModel() {
     private val TAG = javaClass.simpleName
@@ -101,6 +110,9 @@ class MarkerViewModel @Inject constructor(
         MutableLiveData<List<TemplateModel>>()
     }
 
+    @JvmField
+    val markerRepository: MarkerRepository
+
     init {
         Intrinsics.checkParameterIsNotNull(baseCloudRepository2, "baseCloudRepository")
         Intrinsics.checkParameterIsNotNull(prefsImpl2, "prefsImpl")
@@ -114,6 +126,7 @@ class MarkerViewModel @Inject constructor(
         imageRepository = imageRepository2
         markerSyncRepository = markerSyncRepository2
         tagRepository = tagRepository2
+        markerRepository = markerRepository2
     }
 
     fun getAllData(markerModel: MarkerModel, markerTemplateIds: List<String>) {
@@ -187,6 +200,11 @@ class MarkerViewModel @Inject constructor(
             imageRepository.deleteByLocalIdParent(idLocal)
             imageRepository.addAll(imageDataModelList)
 
+            val syncedMarkers = markerSyncRepository.findByProjectId(markerModel.id)
+            val newMarker = syncedMarkers.find { it.idLocal == markerModel.idLocal }
+
+            saveMarker(newMarker?.toModel() ?: throw NullPointerException("newMarker is null"))
+
             markerChangeTask.postValue(true)
         }
     }
@@ -210,6 +228,71 @@ class MarkerViewModel @Inject constructor(
                 is ResultWrapper.Error -> error.postValue(result)
                 is ResultWrapper.Success -> imagesData.postValue(result.value)
             }
+        }
+    }
+
+
+    suspend fun saveMarker(markerModel: MarkerModel) {
+        if (!prefsImpl.offline) {
+            val markerNullable = markerModel.toNullable()
+
+            // Set ID to null if status is NEW
+            if (markerNullable.status == Constants.MarkerStatus.NEW) {
+                markerNullable.id = null
+            }
+
+            // Generate a random marker ID if none is present
+            if (markerNullable.markerId.isNullOrEmpty()) {
+                markerNullable.markerId = UUID.randomUUID().toString()
+            }
+
+            when (val result = baseCloudRepository.saveMarker(markerNullable)) {
+
+                is ResultWrapper.Error -> {
+                    error.postValue(result)
+                }
+
+                is ResultWrapper.Success -> {
+                   // deleteMarkerSyncById(markerModel.id)
+
+                    // Save the updated marker data
+                    val savedMarker = result.value
+                    if (savedMarker != null) {
+                        insertMarkerEntity(savedMarker)
+                    }
+
+                    // Handle associated images
+                    imageRepository.getByLocalIdParent(
+                        markerModel.idLocal ?: error("ID Local is null")
+                    ).forEach { imageData ->
+                        imageData.file?.let { saveImage(it, savedMarker?.id.toString()) }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun insertMarkerEntity(markerModel: MarkerModel) {
+        markerRepository.addWithReplace(markerModel)
+    }
+
+    private fun deleteMarkerSyncById(str: String) {
+        markerSyncRepository.deleteById(str)
+    }
+
+    suspend fun saveImage(file: File, parentId: String) {
+        // Compress the image file
+        val compressedImageFile = Compressor.compress(App.instance, file)
+
+        // Prepare the multipart body for the request
+        val requestFile =
+            RequestBody.create("multipart/form-data".toMediaTypeOrNull(), compressedImageFile)
+        val body = MultipartBody.Part.createFormData("data", compressedImageFile.name, requestFile)
+
+        // Save the image using the BaseCloudRepository
+        when (val result = baseCloudRepository.saveImage(parentId, body)) {
+            is ResultWrapper.Error -> error.postValue(result)
+            is ResultWrapper.Success -> Unit // Handle success if needed
         }
     }
 }

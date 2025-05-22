@@ -30,6 +30,6 @@ public interface MarkerSyncDao {
 
     // Вставка одного объекта с заменой при конфликте
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertWithReplace(MarkerModelSync markerModelSync);
+    long insertWithReplace(MarkerModelSync markerModelSync);
 }
 
