@@ -85,6 +85,11 @@ class ProjectsViewModel @Inject constructor(
         getTags()
     }
 
+    fun launch(){
+        projects
+        getTags()
+    }
+
     /* access modifiers changed from: private */
     private fun insertTagEntityList(list: List<TagModel?>?) {
         tagRepository.deleteAll()
@@ -125,16 +130,23 @@ class ProjectsViewModel @Inject constructor(
                 isRefreshing.postValue(true)
 
                 if (prefsImpl.offline) {
+                    println("terra if")
                     val allProjects = projectRepository.findAll()
                     projectsAll.addAll(allProjects)
                     projectsData.postValue(allProjects)
                     isRefreshing.postValue(false)
                 } else {
+
                     pageProject++
                     val result = baseCloudRepository.getProjectList(pageProject)
+                    println("terra else $result")
 
                     when (result) {
-                        is ResultWrapper.Error -> error.postValue(result)
+                        is ResultWrapper.Error -> {
+                            val newProjects = projectRepository.findAll()
+                            projectsAll.addAll(newProjects)
+                            projectsData.postValue(projectsAll)
+                        }
                         is ResultWrapper.Success -> {
                             val newProjects = result.value
                             if (newProjects?.isNotEmpty() == true) {

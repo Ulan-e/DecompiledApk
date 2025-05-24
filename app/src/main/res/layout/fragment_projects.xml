@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/white"
     android:tag="layout/fragment_projects_0">
 
@@ -78,4 +79,11 @@
             android:text="@string/retry"
             android:textColor="@color/color_3062EF" />
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        tools:visibility="visible" />
 </RelativeLayout>

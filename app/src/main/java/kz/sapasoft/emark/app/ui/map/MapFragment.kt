@@ -170,6 +170,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
             utils.hideKeyboard(textView2)
             viewModel.getMarkerList(arrayListOf(projectModel.id))
             viewModel.getTemplateList(projectModel.markerTemplateIds)
+            viewModel.saveProject(projectModel)
 
             val activity2: FragmentActivity = requireActivity()
             if (activity2 != null) {

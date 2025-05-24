@@ -16,8 +16,10 @@ import kz.sapasoft.emark.app.data.local.prefs.PrefsImpl
 import kz.sapasoft.emark.app.data.local.room.image.ImageRepository
 import kz.sapasoft.emark.app.data.local.room.marker.MarkerRepository
 import kz.sapasoft.emark.app.data.local.room.marker_sync.MarkerSyncRepository
+import kz.sapasoft.emark.app.data.local.room.project.ProjectRepository
 import kz.sapasoft.emark.app.data.local.room.template.TemplateRepository
 import kz.sapasoft.emark.app.domain.model.MarkerModel
+import kz.sapasoft.emark.app.domain.model.ProjectModel
 import kz.sapasoft.emark.app.domain.model.TemplateModel
 import kz.sapasoft.emark.app.utils.Constants
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -33,6 +35,7 @@ class MapViewModel @Inject constructor(
     imageRepository2: ImageRepository,
     markerRepository2: MarkerRepository,
     markerSyncRepository2: MarkerSyncRepository,
+    projectsRepository2: ProjectRepository,
     prefsImpl2: PrefsImpl
 ) : BaseViewModel() {
     private val TAG = javaClass.simpleName
@@ -52,6 +55,9 @@ class MapViewModel @Inject constructor(
     /* access modifiers changed from: private */
     @JvmField
     val markerRepository: MarkerRepository
+
+    @JvmField
+    val projectsRepository: ProjectRepository
 
     /* access modifiers changed from: private */
     @JvmField
@@ -75,7 +81,13 @@ class MapViewModel @Inject constructor(
         imageRepository = imageRepository2
         markerRepository = markerRepository2
         markerSyncRepository = markerSyncRepository2
+        projectsRepository = projectsRepository2
         prefsImpl = prefsImpl2
+    }
+
+    fun saveProject(projectModel: ProjectModel){
+        val newLocalProjectId = projectsRepository.addProject(projectModel)
+        Log.d("terra", "MapViewModel newLocalProjectId $newLocalProjectId")
     }
 
     fun getMarkerList(projectIds: List<String?>) {

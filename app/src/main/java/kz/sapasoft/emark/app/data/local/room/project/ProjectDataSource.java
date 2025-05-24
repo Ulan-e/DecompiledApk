@@ -17,9 +17,9 @@ public final class ProjectDataSource implements ProjectRepository {
         this.projectDao = projectDao2;
     }
 
-    public void addProject(ProjectModel projectModel) {
+    public long addProject(ProjectModel projectModel) {
         Intrinsics.checkParameterIsNotNull(projectModel, "projectModel");
-        this.projectDao.insert(projectModel);
+        return this.projectDao.insert(projectModel);
     }
 
     public void addProjectList(List<ProjectModel> list) {

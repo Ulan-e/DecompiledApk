@@ -30,6 +30,6 @@ public interface ProjectDao {
 
     // Вставка одной записи с игнорированием конфликта
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insert(ProjectModel projectModel);
+    long insert(ProjectModel projectModel);
 }
 

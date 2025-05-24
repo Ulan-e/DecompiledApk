@@ -84,7 +84,7 @@ class WelcomeActivity : DaggerAppCompatActivity() {
         }
 
         viewModel.server.observe(this as LifecycleOwner) { serverUrl ->
-            findViewById<TextInputEditText>(R.id.et_server).setText(serverUrl)
+          //  findViewById<TextInputEditText>(R.id.et_server).setText(serverUrl)
         }
     }
 

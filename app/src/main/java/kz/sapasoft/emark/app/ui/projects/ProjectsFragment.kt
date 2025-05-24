@@ -5,10 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
@@ -85,7 +87,17 @@ class ProjectsFragment : DaggerFragmentExtended(), OnProjectClickListener {
                 initRecyclerView(view)
                 view.findViewById<SwipeRefreshLayout>(R.id.swipe).setOnRefreshListener {
                     adapter.clear()
-                    viewModel.projects
+                    viewModel.projectsData.observe(viewLifecycleOwner) { projectModels ->
+                        val linearLayout = view?.findViewById<LinearLayout>(R.id.ll_connection_error)
+                        linearLayout?.visibility = View.GONE
+
+                        view.findViewById<SwipeRefreshLayout>(R.id.swipe).setRefreshing(false);
+                        projectModels?.let {
+                            if (it.isNotEmpty()) {
+                                this.adapter.add(it)
+                            }
+                        }
+                    }
                 }
                 return
             }
@@ -137,12 +149,17 @@ class ProjectsFragment : DaggerFragmentExtended(), OnProjectClickListener {
             Toast.makeText(context, error?.message ?: "Unknown error", Toast.LENGTH_SHORT).show()
         }
 
+        viewModel.isRefreshing.observe(viewLifecycleOwner) { isRefreshing ->
+            val progressBar = view?.findViewById<ProgressBar>(R.id.pb_main)
+            progressBar?.isVisible = isRefreshing
+        }
+
     }
 
     private fun setListeners(view: View) {
-        view.findViewById<TextView>(R.id.tv_retry).setOnClickListener(
-            `ProjectsFragment$setListeners$1`(this)
-        )
+        view.findViewById<TextView>(R.id.tv_retry).setOnClickListener {
+            setObservers()
+        }
     }
 
     override fun onProjectClick(projectModel: ProjectModel) {

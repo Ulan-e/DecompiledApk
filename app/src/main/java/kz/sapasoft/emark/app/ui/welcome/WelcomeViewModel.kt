@@ -63,8 +63,6 @@ class WelcomeViewModel @Inject constructor(
     }
 
     fun login(username: String?, password: String?, server: String?) {
-        val isNetOn = verifyAvailableNetwork()
-        println("terra isNetOn $isNetOn")
         if (verifyAvailableNetwork()) {
             launchIO {
                 isRefreshing.postValue(true)
@@ -90,13 +88,7 @@ class WelcomeViewModel @Inject constructor(
                 isRefreshing.postValue(false)
             }
         } else if (username == prefsImpl.username && password == prefsImpl.password) {
-           // loginData.postValue(true)
-            error.postValue(
-                ResultWrapper.Error(
-                    status = ErrorStatus.NO_CONNECTION,
-                    message = context.getString(R.string.no_internet_connection)
-                )
-            )
+           loginData.postValue(true)
         }
     }
 
