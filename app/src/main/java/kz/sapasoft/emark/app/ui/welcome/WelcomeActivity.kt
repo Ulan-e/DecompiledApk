@@ -61,7 +61,7 @@ class WelcomeActivity : DaggerAppCompatActivity() {
         }
 
         viewModel.error.observe(this as LifecycleOwner) { error ->
-            val errorMessage = error.toString() ?: getString(R.string.error)
+            val errorMessage = error.message ?: getString(R.string.error)
             val materialButton: MaterialButton = findViewById(R.id.btn_start)
             Snackbar.make(materialButton, errorMessage, Snackbar.LENGTH_SHORT).show()
         }

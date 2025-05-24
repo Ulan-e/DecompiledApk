@@ -4,12 +4,15 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.util.Log
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.MutableLiveData
+import com.example.decompiledapk.R
 import kz.sapasoft.emark.app.core.BaseViewModel
 import kz.sapasoft.emark.app.core.Config
 import kz.sapasoft.emark.app.data.cloud.ResultWrapper
 import kz.sapasoft.emark.app.data.cloud.repository.BaseCloudRepository
 import kz.sapasoft.emark.app.data.local.prefs.PrefsImpl
+import kz.sapasoft.emark.app.domain.model.response.ErrorStatus
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.jvm.internal.Intrinsics
@@ -60,11 +63,12 @@ class WelcomeViewModel @Inject constructor(
     }
 
     fun login(username: String?, password: String?, server: String?) {
-
+        val isNetOn = verifyAvailableNetwork()
+        println("terra isNetOn $isNetOn")
         if (verifyAvailableNetwork()) {
             launchIO {
                 isRefreshing.postValue(true)
-                val localServer = "https://emark.ktga.kz"
+                val localServer = server
                 val result = baseCloudRepository.login(
                     url = "service/auth/login",
                     username = username.orEmpty(),
@@ -86,17 +90,19 @@ class WelcomeViewModel @Inject constructor(
                 isRefreshing.postValue(false)
             }
         } else if (username == prefsImpl.username && password == prefsImpl.password) {
-            loginData.postValue(true)
+           // loginData.postValue(true)
+            error.postValue(
+                ResultWrapper.Error(
+                    status = ErrorStatus.NO_CONNECTION,
+                    message = context.getString(R.string.no_internet_connection)
+                )
+            )
         }
     }
 
     private fun verifyAvailableNetwork(): Boolean {
-        val systemService = context.getSystemService(Context.CONNECTIVITY_SERVICE)
-        if (systemService != null) {
-            val activeNetworkInfo: NetworkInfo =
-                (systemService as ConnectivityManager).getActiveNetworkInfo()!!
-            return activeNetworkInfo != null && activeNetworkInfo.isConnected()
-        }
-        throw TypeCastException("null cannot be cast to non-null type android.net.ConnectivityManager")
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+        val activeNetworkInfo = connectivityManager?.activeNetworkInfo
+        return activeNetworkInfo?.isConnected == true
     }
 }
