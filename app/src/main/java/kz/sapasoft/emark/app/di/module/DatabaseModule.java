@@ -34,7 +34,7 @@ public final class DatabaseModule {
     @Singleton
     @Provides
     public final LocalDatabase providesRoomDatabase() {
-        return Room.databaseBuilder(App.Companion.getInstance(), LocalDatabase.class, "emark_db").allowMainThreadQueries().build();
+        return Room.databaseBuilder(App.Companion.getInstance(), LocalDatabase.class, "emark_data").allowMainThreadQueries().build();
     }
 
     @Singleton

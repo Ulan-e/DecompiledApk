@@ -89,6 +89,7 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true);
         if(mMarkerModel != null) {
             viewModel.getAllData(mMarkerModel!!, mProjectModel!!.markerTemplateIds)
         }
@@ -237,7 +238,7 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
             val toolbar = requireView().findViewById<Toolbar>(R.id.toolbar)
             Snackbar.make(
                 toolbar,
-                error?.toString() ?: "Unknown error",
+                error?.message.toString() ?: "Unknown error",
                 Snackbar.LENGTH_SHORT
             ).show()
         }

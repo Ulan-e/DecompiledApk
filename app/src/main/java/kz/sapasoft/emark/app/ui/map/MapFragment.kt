@@ -236,11 +236,11 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
             requireContext(),
             object : BluetoothServiceCallback {
                 override fun onDiscovered(value: String?) {
-                    Log.d(TAG, "BS onDiscovered value $value ")
+                    Log.d(TAG, "BluetoothService onDiscovered value $value ")
                     activity?.runOnUiThread {
                         if (isAdded) { // Ensure fragment is still added and has a context
                             context?.let { ctx ->
-                                ctx.showToast("BS onDiscovered value $value")
+                                ctx.showToast("BluetoothService onDiscovered value $value")
                             }
                         }
                     }
@@ -252,14 +252,14 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                     characteristicValue: String?
                 ) {
                     Log.d(
-                        TAG, "BS onChanged " +
+                        TAG, "BluetoothService onChanged " +
                                 "serviceId: $serviceId " +
                                 "characteristicId $characteristicId " +
                                 "characteristicValue $characteristicValue"
                     )
 
                     if (characteristicValue != null) {
-                        Log.d(TAG, "BS connecting $characteristicValue")
+                        Log.d(TAG, "BluetoothService connecting $characteristicValue")
                         if (viewModel.checkId(characteristicValue)) {
                             addMarker(characteristicValue)
                         } else {
@@ -269,7 +269,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                 }
 
                 override fun onError(e: Exception?) {
-                    Log.d(TAG, "BS onError e: ${e?.message}")
+                    Log.d(TAG, "BluetoothService onError e: ${e?.message}")
                     e?.printStackTrace()
                     activity?.runOnUiThread {
                         if (isAdded) {

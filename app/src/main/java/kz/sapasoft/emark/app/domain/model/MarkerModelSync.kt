@@ -1,11 +1,17 @@
 package kz.sapasoft.emark.app.domain.model
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import kz.sapasoft.emark.app.utils.Constants
 import java.io.Serializable
 
-@Entity("marker_sync")
+@Entity(
+    "marker_sync",
+    indices = [Index(
+        value = ["markerId"], unique = true
+    )]
+)
 data class MarkerModelSync(
     @PrimaryKey var id: String,
     var updated: Long? = null,

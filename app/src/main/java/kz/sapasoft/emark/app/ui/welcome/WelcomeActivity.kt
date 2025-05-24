@@ -1,7 +1,12 @@
 package kz.sapasoft.emark.app.ui.welcome
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import com.example.decompiledapk.R
@@ -10,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import dagger.android.support.DaggerAppCompatActivity
 import kz.sapasoft.emark.app.ui.MainActivity
+import kz.sapasoft.emark.app.utils.Utils
 import javax.inject.Inject
 
 class WelcomeActivity : DaggerAppCompatActivity() {
@@ -33,11 +39,22 @@ class WelcomeActivity : DaggerAppCompatActivity() {
         setContentView(R.layout.activity_welcome)
         setOnClickListeners()
         setObservers()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    1001
+                )
+            }
+        }
     }
 
     private fun setOnClickListeners() {
         findViewById<MaterialButton>(R.id.btn_start).setOnClickListener { view ->
-        //    Utils.hideKeyboard(view)
+            Utils.INSTANCE.hideKeyboard(view)
             val username = findViewById<TextInputEditText>(R.id.et_username).text.toString()
             val password = findViewById<TextInputEditText>(R.id.et_password).text.toString()
             val serverUrl = findViewById<TextInputEditText>(R.id.et_server).text.toString()
@@ -67,7 +84,9 @@ class WelcomeActivity : DaggerAppCompatActivity() {
         }
 
         viewModel.server.observe(this as LifecycleOwner) { serverUrl ->
-            //findViewById<TextInputEditText>(R.id.et_server).setText(serverUrl)
+            findViewById<TextInputEditText>(R.id.et_server).setText(serverUrl)
         }
     }
+
+
 }
