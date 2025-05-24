@@ -35,6 +35,8 @@
         android:background="@drawable/search_rounded"
         android:drawableLeft="@drawable/ic_search"
         android:drawablePadding="10dp"
+        android:inputType="text"
+        android:imeOptions="actionDone"
         android:hint="@string/find_project"
         android:padding="15dp"
         android:tag="binding_2"

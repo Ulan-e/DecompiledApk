@@ -85,11 +85,6 @@ class ProjectsViewModel @Inject constructor(
         getTags()
     }
 
-    fun launch(){
-        projects
-        getTags()
-    }
-
     /* access modifiers changed from: private */
     private fun insertTagEntityList(list: List<TagModel?>?) {
         tagRepository.deleteAll()
@@ -149,9 +144,11 @@ class ProjectsViewModel @Inject constructor(
                         }
                         is ResultWrapper.Success -> {
                             val newProjects = result.value
+                            println("terra newProjects $newProjects")
                             if (newProjects?.isNotEmpty() == true) {
                                 projectsAll.addAll(newProjects)
-                                projects // recursively calls itself to load more projects
+                                projectsData.postValue(projectsAll)
+                                //projects // recursively calls itself to load more projects
                             } else {
                                 projectsData.postValue(projectsAll)
                             }
@@ -163,18 +160,19 @@ class ProjectsViewModel @Inject constructor(
         }
 
     fun getFilteredProjects(filter: String) {
+        println("terra filter $filter")
         val filteredProjects = projectsAll.filter { project ->
-            val projectName = project.name?.toLowerCase(Locale.ROOT)
-            val filterText = filter.toLowerCase(Locale.ROOT)
+            val projectName = project.name.lowercase()
+            val filterText = filter.lowercase()
 
-            if (projectName != null && projectName.contains(filterText)) {
+            if (projectName.contains(filterText)) {
                 true
             } else {
-                val regionName = project.regionName?.toLowerCase(Locale.ROOT)
-                regionName != null && regionName.contains(filterText)
+                val regionName = project.regionName?.lowercase()
+                regionName?.contains(filterText) ?: false
             }
         }
-
+        println("terra filterred  ${filteredProjects.toString()}")
         projectsData.postValue(filteredProjects)
     }
 }

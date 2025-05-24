@@ -87,7 +87,7 @@ class MapViewModel @Inject constructor(
 
     fun saveProject(projectModel: ProjectModel){
         val newLocalProjectId = projectsRepository.addProject(projectModel)
-        Log.d("terra", "MapViewModel newLocalProjectId $newLocalProjectId")
+        Log.d("MapViewModel", "MapViewModel newLocalProjectId $newLocalProjectId")
     }
 
     fun getMarkerList(projectIds: List<String?>) {
