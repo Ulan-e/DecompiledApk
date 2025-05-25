@@ -90,6 +90,10 @@ class MarkerViewModel @Inject constructor(
     val loading: MutableLiveData<Boolean?> by lazy {
         MutableLiveData<Boolean?>()
     }
+    val message: MutableLiveData<String?> by lazy {
+        MutableLiveData<String?>()
+    }
+
 
     val localImagesData: MutableLiveData<List<ImageDataModel>> by lazy {
         MutableLiveData<List<ImageDataModel>>()
@@ -267,6 +271,7 @@ class MarkerViewModel @Inject constructor(
                     ).forEach { imageData ->
                         imageData.file?.let { saveImage(it, savedMarker?.id.toString()) }
                     }
+                    message.postValue("Маркер успешно добавлен")
                 }
             }
         }

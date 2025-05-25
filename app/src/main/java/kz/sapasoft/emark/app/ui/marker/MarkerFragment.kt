@@ -239,7 +239,7 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
             Snackbar.make(
                 toolbar,
                 error?.message.toString() ?: "Unknown error",
-                Snackbar.LENGTH_SHORT
+                Snackbar.LENGTH_LONG
             ).show()
         }
 
@@ -281,6 +281,15 @@ class MarkerFragment : DaggerFragmentExtended(), OnFieldValueChangeListener, OnM
                 // Рисуем список полей
                 val fields = templateModel?.fields ?: list.firstOrNull()?.fields
                 fields?.let { drawFieldList(it) }
+            }
+
+            viewModel.message.observe(viewLifecycleOwner){ message ->
+                val toolbarView = rootView?.findViewById<Toolbar>(R.id.toolbar) ?: throw IllegalArgumentException("view is null")
+                Snackbar.make(
+                    toolbarView ,
+                    message.toString(),
+                    BaseTransientBottomBar.LENGTH_SHORT
+                ).show()
             }
         }
     }

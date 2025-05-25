@@ -268,7 +268,7 @@ class MapViewModel @Inject constructor(
     val markerSize: Float
         get() = prefsImpl.markerSize
 
-    fun getMarkerModelFromByteStr(str: String?, location: Location?): MarkerModel? {
+    fun getMarkerModelFromByteStr(str: String?, projectId: String, location: Location?): MarkerModel? {
         if (str.isNullOrEmpty() || location == null) return null
 
         val idRegex = Regex("(?<=#:)(.*)")
@@ -283,6 +283,7 @@ class MapViewModel @Inject constructor(
         val uuid = UUID.randomUUID().toString()
 
         return MarkerModel(
+            projectIds = arrayListOf(projectId),
             idLocal = uuid,
             id = id,
             markerModel = model,

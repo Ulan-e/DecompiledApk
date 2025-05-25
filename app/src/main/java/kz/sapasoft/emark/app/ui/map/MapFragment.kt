@@ -330,7 +330,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
         viewModel.error.observe(viewLifecycleOwner) { error ->
             val errorMessage = error?.toString() ?: "Error ______"
             Log.e("MapFragment","errorMessage while syncing with server $errorMessage")
-            // showSnackBar(errorMessage)
+            showSnackBar(errorMessage)
         }
     }
 
@@ -541,7 +541,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                     if (location3 == null) {
                         Intrinsics.throwNpe()
                     }
-                    openMarkerFragment(viewModel.getMarkerModelFromByteStr(str, location3)!!)
+                    openMarkerFragment(viewModel.getMarkerModelFromByteStr(str, projectModel.id, location3)!!)
                     return
                 }
             }
@@ -569,7 +569,8 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
         Log.e("addMarker", "New marker from scanner")
         val viewModel = viewModel
         val location3 = this.getMapLocation()
-        val marker = viewModel.getMarkerModelFromByteStr(str, location3)
+        val projectId = projectModel.id
+        val marker = viewModel.getMarkerModelFromByteStr(str, projectId, location3)
         if (marker != null) {
             addGasMarkerToMapMarkers(marker,1)
             openMarkerFragment(marker)
@@ -603,7 +604,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
         )
         builder.setPositiveButton(getString(R.string.yes)) { dialog, _ ->
             val location = getMapLocation() ?: throw NullPointerException("Location is null")
-            val markerModel = viewModel.getMarkerModelFromByteStr(str, location)
+            val markerModel = viewModel.getMarkerModelFromByteStr(str, projectModel.id, location)
             openMarkerFragment(markerModel!!)
             dialog.dismiss()
         }
