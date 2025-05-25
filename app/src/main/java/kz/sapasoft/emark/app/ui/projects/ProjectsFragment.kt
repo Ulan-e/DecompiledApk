@@ -166,19 +166,17 @@ class ProjectsFragment : DaggerFragmentExtended(), OnProjectClickListener {
         }
     }
 
-    private fun search(view: View){
+    private fun search(view: View) {
         view.findViewById<EditText>(R.id.et_search).addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                println("terra beforeTextChanged ")
+
             }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                println("terra onTextChanged ")
                 val query = s.toString()
                 adapter.clear()
                 viewModel.getFilteredProjects(query)
             }
             override fun afterTextChanged(s: Editable?) {
-                println("terra afterTextChanged ")
             }
         })
     }

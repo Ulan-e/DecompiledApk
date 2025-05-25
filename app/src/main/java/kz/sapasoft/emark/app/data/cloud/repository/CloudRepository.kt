@@ -81,8 +81,8 @@ class CloudRepository(
         return safeApiCall(dispatcher) {
             apIs.getProjectList(
                 namePart = "*",
-                offset = (i - 1) * 50,
-                limit = 50,
+                offset = (i - 1) * 0,
+                limit = 999,
                 light = false,
                 calculatePermissions = true
             )

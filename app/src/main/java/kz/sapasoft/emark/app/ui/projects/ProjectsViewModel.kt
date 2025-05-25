@@ -1,5 +1,6 @@
 package kz.sapasoft.emark.app.ui.projects
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import kz.sapasoft.emark.app.core.BaseViewModel
 import kz.sapasoft.emark.app.data.cloud.ResultWrapper
@@ -125,7 +126,6 @@ class ProjectsViewModel @Inject constructor(
                 isRefreshing.postValue(true)
 
                 if (prefsImpl.offline) {
-                    println("terra if")
                     val allProjects = projectRepository.findAll()
                     projectsAll.addAll(allProjects)
                     projectsData.postValue(allProjects)
@@ -134,7 +134,7 @@ class ProjectsViewModel @Inject constructor(
 
                     pageProject++
                     val result = baseCloudRepository.getProjectList(pageProject)
-                    println("terra else $result")
+                    Log.d(TAG,"getProjectList $result")
 
                     when (result) {
                         is ResultWrapper.Error -> {
@@ -144,7 +144,7 @@ class ProjectsViewModel @Inject constructor(
                         }
                         is ResultWrapper.Success -> {
                             val newProjects = result.value
-                            println("terra newProjects $newProjects")
+                            Log.d(TAG, "newProjects ${newProjects?.size}")
                             if (newProjects?.isNotEmpty() == true) {
                                 projectsAll.addAll(newProjects)
                                 projectsData.postValue(projectsAll)
@@ -160,7 +160,6 @@ class ProjectsViewModel @Inject constructor(
         }
 
     fun getFilteredProjects(filter: String) {
-        println("terra filter $filter")
         val filteredProjects = projectsAll.filter { project ->
             val projectName = project.name.lowercase()
             val filterText = filter.lowercase()
@@ -172,7 +171,6 @@ class ProjectsViewModel @Inject constructor(
                 regionName?.contains(filterText) ?: false
             }
         }
-        println("terra filterred  ${filteredProjects.toString()}")
         projectsData.postValue(filteredProjects)
     }
 }
