@@ -203,11 +203,11 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                 openMarkerFragment(
                     MarkerModel(
                         projectIds = arrayListOf(projectModel.id),
-                        idLocal = UUID.randomUUID().toString(),
+                        idLocal = generateRandom10DigitString(),
                         markerModel = "1405",
                         generalId = markerId,
                         markerId = markerId,
-                        id = UUID.randomUUID().toString(),
+                        id = projectModel.id,
                         location = listOf(markerLocation.latitude, markerLocation.longitude),
                         status = Constants.MarkerStatus.NEW
                     )
@@ -467,7 +467,9 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
     }
 
     override fun onMarkerChange() {
-        viewModel.getMarkerEntityList(projectModel.id)
+        //TODO(uncomment)
+       // viewModel.getMarkerEntityList(projectModel.id)
+        viewModel.getMarkerList(arrayListOf(projectModel.id))
     }
 
     override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
