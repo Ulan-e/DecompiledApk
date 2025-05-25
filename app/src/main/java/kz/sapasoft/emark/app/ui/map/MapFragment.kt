@@ -468,7 +468,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
 
     override fun onMarkerChange() {
         //TODO(uncomment)
-       // viewModel.getMarkerEntityList(projectModel.id)
+      //  viewModel.getMarkerEntityList(projectModel.id)
         viewModel.getMarkerList(arrayListOf(projectModel.id))
     }
 
