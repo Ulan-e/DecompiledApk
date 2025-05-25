@@ -208,8 +208,6 @@ class MarkerViewModel @Inject constructor(
             val newMarker = syncedMarkers.find { it.idLocal == markerModel.idLocal }
 
             saveMarker(newMarker?.toModel() ?: throw NullPointerException("newMarker is null"))
-
-            markerChangeTask.postValue(true)
         }
     }
 
@@ -272,6 +270,7 @@ class MarkerViewModel @Inject constructor(
                         imageData.file?.let { saveImage(it, savedMarker?.id.toString()) }
                     }
                     message.postValue("Маркер успешно добавлен")
+                    markerChangeTask.postValue(true)
                 }
             }
         }
