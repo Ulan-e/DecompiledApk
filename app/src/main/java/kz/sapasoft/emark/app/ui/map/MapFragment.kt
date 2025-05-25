@@ -574,7 +574,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
         val projectId = projectModel.id
         val marker = viewModel.getMarkerModelFromByteStr(str, projectId, location3)
         if (marker != null) {
-            addGasMarkerToMapMarkers(marker,1)
+//            addGasMarkerToMapMarkers(marker,1) i надо считать, считать мы не будем, если мы отгружаем на сервер сразу маркер - то есть когда нажимаем кнопку Сохранить, мы сразу должны отправить попытаться на сервер
             openMarkerFragment(marker)
         }
     }
