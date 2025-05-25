@@ -207,7 +207,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                         markerModel = "1405",
                         generalId = markerId,
                         markerId = markerId,
-                        id = projectModel.id,
+                        id = UUID.randomUUID().toString(),
                         location = listOf(markerLocation.latitude, markerLocation.longitude),
                         status = Constants.MarkerStatus.NEW
                     )
