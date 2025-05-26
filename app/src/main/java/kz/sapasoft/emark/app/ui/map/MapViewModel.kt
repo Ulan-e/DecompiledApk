@@ -284,8 +284,8 @@ class MapViewModel @Inject constructor(
 
         return MarkerModel(
             projectIds = arrayListOf(projectId),
-            idLocal = uuid,
-            id = id,
+            idLocal = id,
+            id = projectId,
             markerModel = model,
             location = listOf(location.latitude, location.longitude),
             markerId = id,

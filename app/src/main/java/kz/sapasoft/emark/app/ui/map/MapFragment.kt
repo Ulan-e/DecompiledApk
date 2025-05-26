@@ -203,7 +203,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                 openMarkerFragment(
                     MarkerModel(
                         projectIds = arrayListOf(projectModel.id),
-                        idLocal = generateRandom10DigitString(),
+                        idLocal = markerId,
                         markerModel = "1405",
                         generalId = markerId,
                         markerId = markerId,
