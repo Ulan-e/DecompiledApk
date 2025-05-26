@@ -207,7 +207,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                         markerModel = "1405",
                         generalId = markerId,
                         markerId = markerId,
-                        id = projectModel.id,
+                        id = UUID.randomUUID().toString(),
                         location = listOf(markerLocation.latitude, markerLocation.longitude),
                         status = Constants.MarkerStatus.NEW
                     )
@@ -328,7 +328,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
             addMapMarkers(markerModels)
         }
         viewModel.error.observe(viewLifecycleOwner) { error ->
-            val errorMessage = error?.toString() ?: "Error ______"
+            val errorMessage = error.message
             Log.e("MapFragment","errorMessage while syncing with server $errorMessage")
             showSnackBar(errorMessage)
         }
@@ -341,7 +341,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
                 mapView!!,
                 it,
                 BaseTransientBottomBar.LENGTH_INDEFINITE
-            ).show()
+            ).setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.white)).show()
         }
     }
 

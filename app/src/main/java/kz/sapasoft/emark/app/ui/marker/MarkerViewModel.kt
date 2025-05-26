@@ -17,6 +17,7 @@ import kz.sapasoft.emark.app.domain.model.ImageDataModel
 import kz.sapasoft.emark.app.domain.model.MarkerModel
 import kz.sapasoft.emark.app.domain.model.TagModel
 import kz.sapasoft.emark.app.domain.model.TemplateModel
+import kz.sapasoft.emark.app.domain.model.response.ErrorStatus
 import kz.sapasoft.emark.app.utils.Constants
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -197,16 +198,24 @@ class MarkerViewModel @Inject constructor(
 
     fun saveMarkerAndImage(markerModel: MarkerModel, imageDataModelList: List<ImageDataModel>) {
         launchIO {
-            markerSyncRepository.addWithReplace(markerModel.toSync())
+            val list = markerSyncRepository.findByProjectId(markerModel.projectIds?.first())
+            println("terra before markerSyncList ${list.size}")
+            list.forEach { item ->
+                println("terra before item ${item.id}")
+            }
+            val newId = markerSyncRepository.addWithReplace(markerModel.toSync())
+            println("terra saveMarkerAndImage markerId = ${markerModel.toSync().toString()} newId $newId")
+            println("terra after markerSyncList ${markerSyncRepository.findByProjectId(markerModel.projectIds?.first()).size}")
 
             val idLocal = markerModel.idLocal ?: throw NullPointerException("idLocal is null")
 
             imageRepository.deleteByLocalIdParent(idLocal)
             imageRepository.addAll(imageDataModelList)
 
-            val syncedMarkers = markerSyncRepository.findByProjectId(markerModel.id)
+            val syncedMarkers = markerSyncRepository.findByProjectId(markerModel.projectIds?.first())
             val newMarker = syncedMarkers.find { it.idLocal == markerModel.idLocal }
 
+            println("terrar newMarker $newMarker ")
             saveMarker(newMarker?.toModel() ?: throw NullPointerException("newMarker is null"))
         }
     }
@@ -251,7 +260,12 @@ class MarkerViewModel @Inject constructor(
             when (val result = baseCloudRepository.saveMarker(markerNullable)) {
 
                 is ResultWrapper.Error -> {
-                    error.postValue(result)
+                    if(result.status == ErrorStatus.NO_CONNECTION) {
+                        message.postValue("Маркер успешно локально добавлен")
+                        markerChangeTask.postValue(true)
+                    }else {
+                        error.postValue(result)
+                    }
                 }
 
                 is ResultWrapper.Success -> {

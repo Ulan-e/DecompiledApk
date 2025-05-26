@@ -21,6 +21,7 @@ import kz.sapasoft.emark.app.data.local.room.template.TemplateRepository
 import kz.sapasoft.emark.app.domain.model.MarkerModel
 import kz.sapasoft.emark.app.domain.model.ProjectModel
 import kz.sapasoft.emark.app.domain.model.TemplateModel
+import kz.sapasoft.emark.app.domain.model.response.ErrorStatus
 import kz.sapasoft.emark.app.utils.Constants
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -99,7 +100,13 @@ class MapViewModel @Inject constructor(
 
             val pageIndex = page++
             when (val result = baseCloudRepository.getMarkerList(pageIndex, projectIds)) {
-                is ResultWrapper.Error -> error.postValue(result)
+                is ResultWrapper.Error -> {
+                    if(result.status == ErrorStatus.NO_CONNECTION){
+                        getMarkerEntityList(projectIds.first())
+                    }else {
+                        error.postValue(result)
+                    }
+                }
                 is ResultWrapper.Success -> {
                     val markers = result.value
                     if (markers.isNotEmpty()) {
@@ -121,7 +128,12 @@ class MapViewModel @Inject constructor(
             if (!prefsImpl.offline) {
                 val result = baseCloudRepository.getTemplateList(ids)
                 when (result) {
-                    is ResultWrapper.Error -> error.postValue(result)
+                    is ResultWrapper.Error ->
+                        if (result.status == ErrorStatus.NO_CONNECTION) {
+                            val localTemplates = templateRepository.findById(ids?.first())
+                        } else {
+                            error.postValue(result)
+                        }
                     is ResultWrapper.Success -> {
                         val templates = result.value?.filterNotNull() // Remove any nulls if present
                         if (templates?.isNotEmpty() == true) {
@@ -199,6 +211,7 @@ class MapViewModel @Inject constructor(
 
             // Get synchronized markers
             val markerSyncList = markerSyncRepository.findByProjectId(str)
+            println("terra markerSyncList ${markerSyncList.size}")
             // Get markers from main repository and filter out those already synced
             val unsyncedMarkers = markerRepository.findByProjectId(str).filter { marker ->
                 markerSyncList.none { syncMarker -> syncMarker.id == marker.id }
@@ -206,6 +219,8 @@ class MapViewModel @Inject constructor(
 
             // Add unique unsynced markers
             markerModels.addAll(unsyncedMarkers)
+
+            println("terra markerModels ${markerModels.size}")
 
             // Convert synced markers to MarkerModel and add them
             markerModels.addAll(markerSyncList.map { it.toModel() })

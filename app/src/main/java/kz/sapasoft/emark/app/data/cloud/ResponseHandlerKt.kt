@@ -1,11 +1,14 @@
-import android.util.Log
+import com.example.decompiledapk.R
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kz.sapasoft.emark.app.core.App
 import kz.sapasoft.emark.app.data.cloud.ResultWrapper
 import kz.sapasoft.emark.app.domain.model.response.ErrorResponse
 import kz.sapasoft.emark.app.domain.model.response.ErrorStatus
 import retrofit2.HttpException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 suspend fun <T> safeApiCall(
     dispatcher: CoroutineDispatcher,
@@ -16,15 +19,34 @@ suspend fun <T> safeApiCall(
             ResultWrapper.Success(apiCall())
         } catch (throwable: Throwable) {
             when (throwable) {
+                is UnknownHostException -> {
+                    ResultWrapper.Error(
+                        ErrorStatus.NO_CONNECTION,
+                        null,
+                        App.instance.getString(R.string.no_internet_connection)
+                    )
+                }
                 is HttpException -> {
+                    val code = throwable.code()
                     ResultWrapper.Error(
                         ErrorStatus.BAD_RESPONSE,
-                        throwable.code(),
+                        code,
                         convertErrorBody(throwable)
                     )
                 }
+                is SocketTimeoutException -> {
+                    ResultWrapper.Error(
+                        ErrorStatus.TIMEOUT,
+                        null,
+                        App.instance.getString(R.string.socket_timeout_exception)
+                    )
+                }
                 else -> {
-                    ResultWrapper.Error(ErrorStatus.NOT_DEFINED, null, throwable.message)
+                    ResultWrapper.Error(
+                        ErrorStatus.NOT_DEFINED,
+                        null,
+                        throwable.message
+                    )
                 }
             }
         }
