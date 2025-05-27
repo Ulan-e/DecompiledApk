@@ -4,6 +4,7 @@ package kz.sapasoft.emark.app.ui.map
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
@@ -107,6 +108,8 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
             false
         }
 
+    private var leftFab: FloatingActionButton? = null
+
     /* access modifiers changed from: private */
     var poiMarkers: RadiusMarkerClusterer? = null
     private val `viewModel$delegate`: MapViewModel by lazy {
@@ -171,6 +174,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
             viewModel.getMarkerList(arrayListOf(projectModel.id))
             viewModel.getTemplateList(projectModel.markerTemplateIds)
             viewModel.saveProject(projectModel)
+            setBluetoothConnectionIndicator()
 
             val activity2: FragmentActivity = requireActivity()
             if (activity2 != null) {
@@ -195,6 +199,7 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
     }
 
     private fun setFloatingActionButton() {
+        leftFab = rootView?.findViewById<FloatingActionButton>(R.id.left_fab)
         val fab = rootView?.findViewById<FloatingActionButton>(R.id.fab)
         fab?.setOnClickListener {
             val markerId = generateRandom10DigitString()
@@ -331,6 +336,19 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
             val errorMessage = error.message
             Log.e("MapFragment","errorMessage while syncing with server $errorMessage")
             showSnackBar(errorMessage)
+        }
+    }
+
+    private fun setBluetoothConnectionIndicator(){
+        leftFab?.backgroundTintList = ColorStateList.valueOf(
+            ContextCompat.getColor(requireContext(), R.color.red)
+        )
+        bluetoothService?.setConnectionCallback {isConnected ->
+                Log.d("BLEq", "connection indicator state $isConnected")
+                val color = if (isConnected) R.color.green else R.color.red
+            leftFab?.backgroundTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(requireContext(), color)
+            )
         }
     }
 

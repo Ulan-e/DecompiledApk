@@ -121,4 +121,6 @@
     <color name="tooltip_background_dark">#e6616161</color>
     <color name="tooltip_background_light">#e6ffffff</color>
     <color name="white">#fff</color>
+    <color name="green">#4CAF50</color>
+    <color name="red">#CE1A1A</color>
 </resources>

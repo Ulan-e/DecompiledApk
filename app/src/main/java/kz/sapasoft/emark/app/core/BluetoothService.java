@@ -21,6 +21,8 @@ public class BluetoothService {
     private final Context context;
     private final BluetoothServiceCallback callback;
 
+    private BluetoothConnectionCallback connectionCallback;
+
     private UUID serviceUUID;
     private UUID characteristicUUID;
     private UUID descriptorUUID; // Usually 00002902-0000-1000-8000-00805f9b34fb for CCCD
@@ -31,6 +33,10 @@ public class BluetoothService {
                             BluetoothServiceCallback callback) {
         this.context = context.getApplicationContext();
         this.callback = callback;
+    }
+
+    public void setConnectionCallback(BluetoothConnectionCallback callback) {
+        connectionCallback = callback;
     }
 
     @SuppressLint("MissingPermission")
@@ -75,15 +81,23 @@ public class BluetoothService {
         }
     }
 
+    private void setConnectionIndicator(boolean isConnected) {
+        if (connectionCallback != null) {
+            connectionCallback.onConnected(isConnected);
+        }
+    }
+
     private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @SuppressLint("MissingPermission")
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothGatt.STATE_CONNECTED) {
                 Log.d(TAG, "Успешное подключение, начинаем service discovery");
+                setConnectionIndicator(true);
                 gatt.discoverServices();
             } else {
                 Log.e(TAG, "Ошибка соединения: статус = " + status);
+                setConnectionIndicator(false);
                 callback.onError(new Exception("Connection failed with status " + status));
                 gatt.close();
                 BluetoothService.this.bluetoothGatt = null;
@@ -108,6 +122,7 @@ public class BluetoothService {
                     for (BluetoothGattCharacteristic characteristicItem : serviceItem.getCharacteristics()) {
                         if (characteristicItem.getUuid().toString().contains("1bb1")) {
                             Log.d(TAG, "  └── Характеристика: " + characteristicItem.getUuid());
+                            setConnectionIndicator(true);
                             characteristicUUID = characteristicItem.getUuid();
                         }
                     }
