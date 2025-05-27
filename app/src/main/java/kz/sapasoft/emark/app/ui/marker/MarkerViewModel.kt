@@ -1,6 +1,5 @@
 package kz.sapasoft.emark.app.ui.marker
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import id.zelory.compressor.Compressor
 import kz.sapasoft.emark.app.core.App
@@ -25,7 +24,6 @@ import okhttp3.RequestBody
 import java.io.File
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.coroutines.Continuation
 import kotlin.jvm.internal.Intrinsics
 
 class MarkerViewModel @Inject constructor(
@@ -198,14 +196,13 @@ class MarkerViewModel @Inject constructor(
 
     fun saveMarkerAndImage(markerModel: MarkerModel, imageDataModelList: List<ImageDataModel>) {
         launchIO {
-            val list = markerSyncRepository.findByProjectId(markerModel.projectIds?.first())
-            println("terra before markerSyncList ${list.size}")
-            list.forEach { item ->
-                println("terra before item ${item.id}")
+            val isExistMarker = markerSyncRepository.isExist(markerModel.markerId)
+            if(!isExistMarker){
+                markerSyncRepository.addWithReplace(markerModel.toSync())
+            }else {
+                error.postValue(ResultWrapper.Error(message = "Данный маркер уже существует локально"))
+                return@launchIO
             }
-            val newId = markerSyncRepository.addWithReplace(markerModel.toSync())
-            println("terra saveMarkerAndImage markerId = ${markerModel.toSync().toString()} newId $newId")
-            println("terra after markerSyncList ${markerSyncRepository.findByProjectId(markerModel.projectIds?.first()).size}")
 
             val idLocal = markerModel.idLocal ?: throw NullPointerException("idLocal is null")
 

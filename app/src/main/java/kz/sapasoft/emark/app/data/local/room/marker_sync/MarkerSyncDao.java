@@ -31,5 +31,8 @@ public interface MarkerSyncDao {
     // Вставка одного объекта с заменой при конфликте
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertWithReplace(MarkerModelSync markerModelSync);
+
+    @Query("SELECT EXISTS(SELECT 1 FROM marker_sync WHERE markerId = :markerId LIMIT 1)")
+    boolean exists(String markerId);
 }
 

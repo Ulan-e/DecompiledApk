@@ -14,4 +14,6 @@ public interface MarkerSyncRepository {
     void deleteById(String str);
 
     List<MarkerModelSync> findByProjectId(String str);
+
+    boolean isExist(String markerId);
 }

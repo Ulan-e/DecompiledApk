@@ -32,8 +32,14 @@ public final class MarkerSyncDataSource implements MarkerSyncRepository {
         return this.markerDao.findByProjectId(str);
     }
 
+    @Override
+    public boolean isExist(String markerId) {
+        return this.markerDao.exists(markerId);
+    }
+
     public void deleteById(String str) {
         Intrinsics.checkParameterIsNotNull(str, "id");
         this.markerDao.deleteById(str);
     }
+
 }
