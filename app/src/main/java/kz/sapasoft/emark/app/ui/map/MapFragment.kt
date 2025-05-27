@@ -194,12 +194,12 @@ class MapFragment : DaggerFragmentExtended(), OnMarkerChangeListener,
         bluetoothService = null // Clear reference
     }
 
-    private fun setFloatingActionButton(){
+    private fun setFloatingActionButton() {
         val fab = rootView?.findViewById<FloatingActionButton>(R.id.fab)
-        val markerId = generateRandom10DigitString()
         fab?.setOnClickListener {
+            val markerId = generateRandom10DigitString()
             val markerLocation = this.getMapLocation()
-            if(markerLocation != null) {
+            if (markerLocation != null) {
                 openMarkerFragment(
                     MarkerModel(
                         projectIds = arrayListOf(projectModel.id),

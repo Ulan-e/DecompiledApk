@@ -113,7 +113,11 @@ class MapViewModel @Inject constructor(
                         markerListAll.addAll(markers)
                         val syncedList = markerListAll.map { it.toSync() }
                         markerSyncRepository.addWithReplace(syncedList)
-                        markerModelListData.postValue(markerListAll)
+
+                        val localMarkers = markerSyncRepository.findByProjectId(projectIds.first())
+                        val finishedList = localMarkers.map { it.toModel() }
+
+                        markerModelListData.postValue(finishedList)
                     } else {
                         insertMarkerEntityList(projectIds.first(), markerListAll)
                         getMarkerEntityList(projectIds.first())
@@ -182,7 +186,8 @@ class MapViewModel @Inject constructor(
             when (val result = baseCloudRepository.saveMarker(markerNullable)) {
 
                 is ResultWrapper.Error -> {
-                    error.postValue(result)
+                    Log.e(TAG, "saveMarker $result")
+                    //error.postValue(result)
                 }
 
                 is ResultWrapper.Success -> {
@@ -211,9 +216,12 @@ class MapViewModel @Inject constructor(
 
             // Get synchronized markers
             val markerSyncList = markerSyncRepository.findByProjectId(str)
-            println("terra markerSyncList ${markerSyncList.size}")
+            markerSyncList.forEach { item ->
+                println("terra markerSyncList item ${item.id}")
+            }
             // Get markers from main repository and filter out those already synced
             val unsyncedMarkers = markerRepository.findByProjectId(str).filter { marker ->
+                println("terra network marker item ${marker.id}")
                 markerSyncList.none { syncMarker -> syncMarker.id == marker.id }
             }
 
@@ -241,7 +249,10 @@ class MapViewModel @Inject constructor(
 
         // Save the image using the BaseCloudRepository
         when (val result = baseCloudRepository.saveImage(parentId, body)) {
-            is ResultWrapper.Error -> error.postValue(result)
+            is ResultWrapper.Error -> {
+                Log.e(TAG, ">>>saveImage $result")
+                error.postValue(result)
+            }
             is ResultWrapper.Success -> Unit // Handle success if needed
         }
     }
