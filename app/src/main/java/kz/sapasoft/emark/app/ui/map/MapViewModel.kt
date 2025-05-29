@@ -5,8 +5,6 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import id.zelory.compressor.Compressor
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kz.sapasoft.emark.app.core.App
 import kz.sapasoft.emark.app.core.BaseViewModel
@@ -111,7 +109,8 @@ class MapViewModel @Inject constructor(
                     val markers = result.value
                     if (markers.isNotEmpty()) {
                         markerListAll.addAll(markers)
-                        val syncedList = markerListAll.map { it.toSync() }
+                        val syncedList = markerListAll.map { it.toSync(it.isNotSynced) }
+                        println("terraw MAP syncedList ${syncedList.size} ")
                         markerSyncRepository.addWithReplace(syncedList)
 
                         val localMarkers = markerSyncRepository.findByProjectId(projectIds.first())
@@ -162,8 +161,10 @@ class MapViewModel @Inject constructor(
 
     suspend fun saveMarkerList(projectId: String) {
         val markerSyncList = markerSyncRepository.findByProjectId(projectId)
+        val unsyncedMarkers = markerSyncList.filter { it.isNotSynced }
+        println("terraw MAP saveMarkerList only unsyced markers ${unsyncedMarkers.size} ")
 
-        for (markerSync in markerSyncList) {
+        for (markerSync in unsyncedMarkers) {
             val markerModel = markerSync.toModel()
             saveMarker(markerModel)
         }
@@ -205,6 +206,8 @@ class MapViewModel @Inject constructor(
                     ).forEach { imageData ->
                         imageData.file?.let { saveImage(it, savedMarker?.id.toString()) }
                     }
+
+                    markerSyncRepository.addWithReplace(markerModel.toSync(false))
                 }
             }
         }
@@ -316,7 +319,7 @@ class MapViewModel @Inject constructor(
             location = listOf(location.latitude, location.longitude),
             markerId = id,
             generalId = id,
-            status = Constants.MarkerStatus.NEW
+            status = Constants.MarkerStatus.NEW,
         )
     }
 }

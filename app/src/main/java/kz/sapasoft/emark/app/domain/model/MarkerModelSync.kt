@@ -27,7 +27,8 @@ data class MarkerModelSync(
     var generalId: String? = null,
     var markerType: String? = null,
     var idLocal: String? = null,
-    var status: Constants.MarkerStatus = Constants.MarkerStatus.NORMAL
+    var status: Constants.MarkerStatus = Constants.MarkerStatus.NORMAL,
+    var isNotSynced: Boolean
 ) : Serializable {
 
     fun toModel(): MarkerModel {
@@ -46,7 +47,8 @@ data class MarkerModelSync(
             generalId = this.generalId,
             markerType = this.markerType,
             idLocal = this.idLocal,
-            status = this.status
+            status = this.status,
+            isNotSynced = this.isNotSynced
         )
     }
 }

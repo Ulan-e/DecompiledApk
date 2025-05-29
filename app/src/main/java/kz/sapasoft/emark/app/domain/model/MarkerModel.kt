@@ -21,7 +21,8 @@ data class MarkerModel(
     var generalId: String? = "",
     var markerType: String? = "",
     var idLocal: String?,
-    var status: Constants.MarkerStatus? = null
+    var status: Constants.MarkerStatus? = null,
+    var isNotSynced: Boolean = false
 ) : Serializable {
 
     fun toNullable(): MarkerModelNullable {
@@ -31,10 +32,11 @@ data class MarkerModel(
         )
     }
 
-    fun toSync(): MarkerModelSync {
+    fun toSync(notSynced: Boolean): MarkerModelSync {
         return MarkerModelSync(
             id, updated, templateId, markerId, markerModel, color, passiveId,
-            projectIds, depth, location, fields, generalId, markerType, idLocal, status ?: Constants.MarkerStatus.NORMAL
+            projectIds, depth, location, fields, generalId, markerType, idLocal, status ?: Constants.MarkerStatus.NORMAL,
+            notSynced
         )
     }
 }

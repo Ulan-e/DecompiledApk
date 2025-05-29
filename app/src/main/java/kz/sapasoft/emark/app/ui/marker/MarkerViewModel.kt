@@ -1,5 +1,10 @@
 package kz.sapasoft.emark.app.ui.marker
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkInfo
+import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import id.zelory.compressor.Compressor
 import kz.sapasoft.emark.app.core.App
@@ -33,7 +38,8 @@ class MarkerViewModel @Inject constructor(
     imageRepository2: ImageRepository,
     markerSyncRepository2: MarkerSyncRepository,
     markerRepository2: MarkerRepository,
-    tagRepository2: TagRepository
+    tagRepository2: TagRepository,
+    val context2: Context
 ) : BaseViewModel() {
     private val TAG = javaClass.simpleName
 
@@ -197,8 +203,14 @@ class MarkerViewModel @Inject constructor(
     fun saveMarkerAndImage(markerModel: MarkerModel, imageDataModelList: List<ImageDataModel>) {
         launchIO {
             val isExistMarker = markerSyncRepository.isExist(markerModel.markerId)
-            if(!isExistMarker){
-                markerSyncRepository.addWithReplace(markerModel.toSync())
+            if (!isExistMarker) {
+                if (verifyAvailableNetwork()) {
+                    println("terraw MARKER put synced = false ")
+                    markerSyncRepository.addWithReplace(markerModel.toSync(notSynced = false))
+                } else {
+                    println("terraw MARKER put synced = true ")
+                    markerSyncRepository.addWithReplace(markerModel.toSync(notSynced = true))
+                }
             }else {
                 error.postValue(ResultWrapper.Error(message = "Данный маркер уже существует локально"))
                 return@launchIO
@@ -214,6 +226,19 @@ class MarkerViewModel @Inject constructor(
 
             println("terrar newMarker $newMarker ")
             saveMarker(newMarker?.toModel() ?: throw NullPointerException("newMarker is null"))
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun verifyAvailableNetwork(): Boolean {
+        val connectivityManager = context2.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager?.activeNetwork
+            val capabilities = connectivityManager?.getNetworkCapabilities(network)
+            capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+        } else {
+            val activeNetworkInfo = connectivityManager?.activeNetworkInfo
+            activeNetworkInfo?.isConnected == true
         }
     }
 
