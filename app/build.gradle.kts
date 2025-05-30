@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.decompiledapk"
+        applicationId = "com.emark.app"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
