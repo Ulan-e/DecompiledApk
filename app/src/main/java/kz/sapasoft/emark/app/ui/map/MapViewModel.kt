@@ -307,14 +307,14 @@ class MapViewModel @Inject constructor(
             Regex("[a-zA-Z0-9]+").containsMatchIn(it)
         } ?: UUID.randomUUID().toString()
 
-        val model = modelRegex.find(str)?.value ?: "1425"
+        val model = modelRegex.find(str)?.value ?: "1425-XR/iD Gas RFiD Ball"
 
         val uuid = UUID.randomUUID().toString()
 
         return MarkerModel(
             projectIds = arrayListOf(projectId),
             idLocal = id,
-            id = projectId,
+            id = id,
             markerModel = model,
             location = listOf(location.latitude, location.longitude),
             markerId = id,
